@@ -1,0 +1,3334 @@
+{
+  "info": {
+    "name": "Task Management System API (UTS Framework Programming - Studi Kasus 4)",
+    "description": "Jalankan lewat Collection Runner secara berurutan. Variabel id disimpan otomatis. Pastikan aplikasi berjalan di baseUrl.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "runId",
+      "value": ""
+    },
+    {
+      "key": "futureDate",
+      "value": ""
+    },
+    {
+      "key": "teamId",
+      "value": ""
+    },
+    {
+      "key": "team2Id",
+      "value": ""
+    },
+    {
+      "key": "memberAId",
+      "value": ""
+    },
+    {
+      "key": "memberBId",
+      "value": ""
+    },
+    {
+      "key": "memberCId",
+      "value": ""
+    },
+    {
+      "key": "projectId",
+      "value": ""
+    },
+    {
+      "key": "taskId",
+      "value": ""
+    },
+    {
+      "key": "task2Id",
+      "value": ""
+    },
+    {
+      "key": "assignmentId",
+      "value": ""
+    },
+    {
+      "key": "assignment2Id",
+      "value": ""
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get(\"runId\")) { pm.collectionVariables.set(\"runId\", Date.now().toString()); }",
+          "pm.collectionVariables.set(\"futureDate\", new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10));"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "00 - Health Check",
+      "item": [
+        {
+          "name": "GET / (aplikasi hidup)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 - Teams",
+      "item": [
+        {
+          "name": "Create team (sukses)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(201); });",
+                  "pm.collectionVariables.set(\"teamId\", pm.response.json().data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tim Backend {{runId}}\",\n  \"description\": \"Tim pengembang API\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create team kedua (sukses)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(201); });",
+                  "pm.collectionVariables.set(\"team2Id\", pm.response.json().data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tim Frontend {{runId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create team - nama duplikat (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(409); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tim Backend {{runId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create team - nama kosong (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });",
+                  "pm.test(\"Pesan error: Nama tim wajib diisi\", () => pm.expect(pm.response.text()).to.include(\"Nama tim wajib diisi\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create team - field tidak dikenal (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X\",\n  \"foo\": \"bar\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get all teams",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });",
+                  "pm.test(\"Data berupa array\", () => pm.expect(pm.response.json().data).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teams",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get team by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });",
+                  "pm.test(\"Relasi members & projects ada\", () => { const d = pm.response.json().data; pm.expect(d.members).to.be.an(\"array\"); pm.expect(d.projects).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get team - id tidak ditemukan (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teams/00000000-0000-4000-8000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "00000000-0000-4000-8000-000000000000"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get team - format id salah (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teams/bukan-uuid",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "bukan-uuid"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update team (sukses)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });",
+                  "pm.test(\"Deskripsi berubah\", () => pm.expect(pm.response.json().data.description).to.include(\"diperbarui\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Tim pengembang API (diperbarui)\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update team - nama bentrok (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(409); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tim Frontend {{runId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update team - id tidak ditemukan (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/00000000-0000-4000-8000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "00000000-0000-4000-8000-000000000000"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Apa saja\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Members",
+      "item": [
+        {
+          "name": "Create member A (anggota Tim Backend)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(201); });",
+                  "pm.collectionVariables.set(\"memberAId\", pm.response.json().data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Andi Pratama\",\n  \"email\": \"andi.{{runId}}@example.com\",\n  \"phone\": \"081234567890\",\n  \"position\": \"Backend Developer\",\n  \"teamId\": \"{{teamId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create member B (anggota Tim Backend)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(201); });",
+                  "pm.collectionVariables.set(\"memberBId\", pm.response.json().data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Budi Santoso\",\n  \"email\": \"budi.{{runId}}@example.com\",\n  \"position\": \"QA Engineer\",\n  \"teamId\": \"{{teamId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create member C (anggota Tim Frontend)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(201); });",
+                  "pm.collectionVariables.set(\"memberCId\", pm.response.json().data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Citra Lestari\",\n  \"email\": \"citra.{{runId}}@example.com\",\n  \"teamId\": \"{{team2Id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create member - email duplikat (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(409); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Andi Lagi\",\n  \"email\": \"andi.{{runId}}@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create member - email tidak valid (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });",
+                  "pm.test(\"Pesan error: Format email tidak valid\", () => pm.expect(pm.response.text()).to.include(\"Format email tidak valid\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dodi\",\n  \"email\": \"bukan-email\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create member - telepon tidak valid (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });",
+                  "pm.test(\"Pesan error: Nomor telepon harus berupa 10-15 digit angka\", () => pm.expect(pm.response.text()).to.include(\"Nomor telepon harus berupa 10-15 digit angka\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dodi\",\n  \"email\": \"dodi.{{runId}}@example.com\",\n  \"phone\": \"abc\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create member - team tidak ditemukan (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dodi\",\n  \"email\": \"dodi.{{runId}}@example.com\",\n  \"teamId\": \"00000000-0000-4000-8000-000000000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get all members",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get member by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });",
+                  "pm.test(\"Relasi team ada\", () => pm.expect(pm.response.json().data.team.id).to.eql(pm.collectionVariables.get(\"teamId\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/members/{{memberAId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members",
+                "{{memberAId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get member - id tidak ditemukan (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/members/00000000-0000-4000-8000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members",
+                "00000000-0000-4000-8000-000000000000"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update member (sukses)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });",
+                  "pm.test(\"Posisi berubah\", () => pm.expect(pm.response.json().data.position).to.eql(\"Senior Backend Developer\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/members/{{memberAId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members",
+                "{{memberAId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"position\": \"Senior Backend Developer\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update member - email bentrok (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(409); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/members/{{memberAId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members",
+                "{{memberAId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"budi.{{runId}}@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Projects",
+      "item": [
+        {
+          "name": "Create project (sukses)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(201); });",
+                  "pm.collectionVariables.set(\"projectId\", pm.response.json().data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Aplikasi Kasir\",\n  \"description\": \"Pengembangan aplikasi kasir\",\n  \"status\": \"active\",\n  \"startDate\": \"2026-11-01\",\n  \"endDate\": \"2026-12-31\",\n  \"teamId\": \"{{teamId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create project - tanggal selesai < tanggal mulai (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Salah Tanggal\",\n  \"startDate\": \"2026-12-31\",\n  \"endDate\": \"2026-11-01\",\n  \"teamId\": \"{{teamId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create project - status tidak valid (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });",
+                  "pm.test(\"Pesan error: Status proyek harus salah satu dari\", () => pm.expect(pm.response.text()).to.include(\"Status proyek harus salah satu dari\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Salah Status\",\n  \"status\": \"ngawur\",\n  \"teamId\": \"{{teamId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create project - team tidak ditemukan (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tanpa Tim\",\n  \"teamId\": \"00000000-0000-4000-8000-000000000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create project - teamId wajib (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });",
+                  "pm.test(\"Pesan error: teamId harus berupa UUID yang valid\", () => pm.expect(pm.response.text()).to.include(\"teamId harus berupa UUID yang valid\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tanpa teamId\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get all projects",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get project by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });",
+                  "pm.test(\"Relasi tasks ada\", () => pm.expect(pm.response.json().data.tasks).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get project - id tidak ditemukan (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/00000000-0000-4000-8000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "00000000-0000-4000-8000-000000000000"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update project (sukses)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Deskripsi diperbarui\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update project - id tidak ditemukan (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/00000000-0000-4000-8000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "00000000-0000-4000-8000-000000000000"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Tasks",
+      "item": [
+        {
+          "name": "Create task (sukses)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(201); });",
+                  "pm.collectionVariables.set(\"taskId\", pm.response.json().data.id);",
+                  "pm.test(\"Status awal todo\", () => pm.expect(pm.response.json().data.status).to.eql(\"todo\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Rancang skema database\",\n  \"description\": \"Buat ERD dan tabel\",\n  \"priority\": \"high\",\n  \"dueDate\": \"{{futureDate}}\",\n  \"projectId\": \"{{projectId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create task kedua (sukses)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(201); });",
+                  "pm.collectionVariables.set(\"task2Id\", pm.response.json().data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Buat endpoint login\",\n  \"projectId\": \"{{projectId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create task - tenggat sudah lewat (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Telat\",\n  \"dueDate\": \"2020-01-01\",\n  \"projectId\": \"{{projectId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create task - prioritas tidak valid (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });",
+                  "pm.test(\"Pesan error: Prioritas harus salah satu dari\", () => pm.expect(pm.response.text()).to.include(\"Prioritas harus salah satu dari\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Salah prioritas\",\n  \"priority\": \"ngawur\",\n  \"projectId\": \"{{projectId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create task - judul kosong (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });",
+                  "pm.test(\"Pesan error: Judul tugas wajib diisi\", () => pm.expect(pm.response.text()).to.include(\"Judul tugas wajib diisi\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"\",\n  \"projectId\": \"{{projectId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create task - project tidak ditemukan (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Tanpa proyek\",\n  \"projectId\": \"00000000-0000-4000-8000-000000000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get all tasks",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get tasks - filter projectId & status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });",
+                  "pm.test(\"Semua hasil berstatus todo\", () => pm.response.json().data.forEach((t) => pm.expect(t.status).to.eql(\"todo\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks?projectId={{projectId}}&status=todo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                },
+                {
+                  "key": "status",
+                  "value": "todo"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get tasks - filter status tidak valid (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks?status=ngawur",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ngawur"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get task by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });",
+                  "pm.test(\"Relasi project & assignments ada\", () => { const d = pm.response.json().data; pm.expect(d.project.id).to.eql(pm.collectionVariables.get(\"projectId\")); pm.expect(d.assignments).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{taskId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{taskId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get task - id tidak ditemukan (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/00000000-0000-4000-8000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "00000000-0000-4000-8000-000000000000"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update task (sukses)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });",
+                  "pm.test(\"Prioritas berubah\", () => pm.expect(pm.response.json().data.priority).to.eql(\"urgent\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{taskId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{taskId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Rancang skema database (revisi)\",\n  \"priority\": \"urgent\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update task - tenggat sudah lewat (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{taskId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{taskId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dueDate\": \"2020-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update task - field status ditolak (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{taskId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{taskId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"done\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update status - todo ke in_progress tanpa penugasan (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{taskId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{taskId}}",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in_progress\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Task Assignments",
+      "item": [
+        {
+          "name": "Assign task ke 2 anggota sekaligus (sukses)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(201); });",
+                  "pm.collectionVariables.set(\"assignmentId\", pm.response.json().data[0].id);",
+                  "pm.collectionVariables.set(\"assignment2Id\", pm.response.json().data[1].id);",
+                  "pm.test(\"2 penugasan dibuat\", () => pm.expect(pm.response.json().data).to.have.lengthOf(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/task-assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "task-assignments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taskId\": \"{{taskId}}\",\n  \"memberIds\": [\n    \"{{memberAId}}\",\n    \"{{memberBId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Assign - anggota sudah ditugaskan (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(409); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/task-assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "task-assignments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taskId\": \"{{taskId}}\",\n  \"memberIds\": [\n    \"{{memberAId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Assign - anggota bukan dari tim proyek (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/task-assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "task-assignments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taskId\": \"{{task2Id}}\",\n  \"memberIds\": [\n    \"{{memberCId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Assign - task tidak ditemukan (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/task-assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "task-assignments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taskId\": \"00000000-0000-4000-8000-000000000000\",\n  \"memberIds\": [\n    \"{{memberAId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Assign - member tidak ditemukan (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/task-assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "task-assignments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taskId\": \"{{task2Id}}\",\n  \"memberIds\": [\n    \"00000000-0000-4000-8000-000000000000\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Assign - memberIds kosong (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });",
+                  "pm.test(\"Pesan error: memberIds minimal berisi satu anggota\", () => pm.expect(pm.response.text()).to.include(\"memberIds minimal berisi satu anggota\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/task-assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "task-assignments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taskId\": \"{{taskId}}\",\n  \"memberIds\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Assign - role tidak valid (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });",
+                  "pm.test(\"Pesan error: Peran harus salah satu dari\", () => pm.expect(pm.response.text()).to.include(\"Peran harus salah satu dari\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/task-assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "task-assignments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taskId\": \"{{task2Id}}\",\n  \"memberIds\": [\n    \"{{memberAId}}\"\n  ],\n  \"role\": \"bos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get all assignments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/task-assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "task-assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get assignment by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });",
+                  "pm.test(\"Relasi task & member ada\", () => { const d = pm.response.json().data; pm.expect(d.task).to.exist; pm.expect(d.member).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/task-assignments/{{assignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "task-assignments",
+                "{{assignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get assignment - id tidak ditemukan (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/task-assignments/00000000-0000-4000-8000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "task-assignments",
+                "00000000-0000-4000-8000-000000000000"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update assignment role (sukses)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });",
+                  "pm.test(\"Role berubah\", () => pm.expect(pm.response.json().data.role).to.eql(\"reviewer\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/task-assignments/{{assignment2Id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "task-assignments",
+                "{{assignment2Id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"reviewer\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update assignment - role tidak valid (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/task-assignments/{{assignment2Id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "task-assignments",
+                "{{assignment2Id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"bos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get task detail beserta anggota yang ditugaskan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });",
+                  "pm.test(\"Daftar anggota ditugaskan ada 2\", () => pm.expect(pm.response.json().data.assignments).to.have.lengthOf(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{taskId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{taskId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Alur Status Task",
+      "item": [
+        {
+          "name": "todo -> in_progress (sukses, sudah ada penugasan)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });",
+                  "pm.test(\"Status in_progress\", () => pm.expect(pm.response.json().data.status).to.eql(\"in_progress\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{taskId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{taskId}}",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in_progress\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "in_progress -> in_progress (400, status sama)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{taskId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{taskId}}",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in_progress\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "in_progress -> done (400, lompat status)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{taskId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{taskId}}",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"done\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Status tidak valid (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });",
+                  "pm.test(\"Pesan error: Status harus salah satu dari\", () => pm.expect(pm.response.text()).to.include(\"Status harus salah satu dari\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{taskId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{taskId}}",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ngawur\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "in_progress -> review (sukses)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{taskId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{taskId}}",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"review\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "review -> done (sukses, completedAt terisi)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Format response standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(true); pm.expect(j.statusCode).to.eql(200); });",
+                  "pm.test(\"completedAt terisi\", () => pm.expect(pm.response.json().data.completedAt).to.not.be.null);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{taskId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{taskId}}",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"done\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Assign ke task yang sudah done (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(400); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/task-assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "task-assignments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taskId\": \"{{taskId}}\",\n  \"memberIds\": [\n    \"{{memberAId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update status - task tidak ditemukan (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/00000000-0000-4000-8000-000000000000/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "00000000-0000-4000-8000-000000000000",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in_progress\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Delete & Konflik Relasi",
+      "item": [
+        {
+          "name": "Delete assignment (204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/task-assignments/{{assignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "task-assignments",
+                "{{assignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete assignment lagi (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/task-assignments/{{assignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "task-assignments",
+                "{{assignmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete task (204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{taskId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{taskId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete task lagi (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{taskId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{taskId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete team yang masih punya proyek (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(409); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete project (204, task ikut terhapus)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete project lagi (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cek task kedua ikut terhapus (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/{{task2Id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tasks",
+                "{{task2Id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete member A (204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/members/{{memberAId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members",
+                "{{memberAId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete member B (204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/members/{{memberBId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members",
+                "{{memberBId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete member C (204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/members/{{memberCId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members",
+                "{{memberCId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete member lagi (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/members/{{memberAId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members",
+                "{{memberAId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete team Backend (204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete team Frontend (204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{team2Id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{team2Id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete team lagi (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Format error standar\", () => { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j.statusCode).to.eql(404); pm.expect(j.error).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

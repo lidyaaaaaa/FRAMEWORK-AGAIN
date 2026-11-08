@@ -1,0 +1,55 @@
+erDiagram
+    TEAMS ||--o{ PROJECTS : "memiliki"
+    TEAMS ||--o{ MEMBERS : "beranggotakan"
+    PROJECTS ||--o{ TASKS : "memiliki"
+    TASKS ||--o{ TASK_ASSIGNMENTS : "ditugaskan lewat"
+    MEMBERS ||--o{ TASK_ASSIGNMENTS : "menerima"
+
+    TEAMS {
+        uuid id PK
+        varchar name UK "maks 100"
+        text description "nullable"
+        timestamp created_at
+        timestamp updated_at
+    }
+    MEMBERS {
+        uuid id PK
+        varchar name
+        varchar email UK
+        varchar phone "nullable"
+        varchar position "nullable"
+        uuid team_id FK "nullable, SET NULL"
+        timestamp created_at
+        timestamp updated_at
+    }
+    PROJECTS {
+        uuid id PK
+        varchar name
+        text description "nullable"
+        varchar status "planning, active, completed, archived"
+        date start_date "nullable"
+        date end_date "nullable"
+        uuid team_id FK "NOT NULL"
+        timestamp created_at
+        timestamp updated_at
+    }
+    TASKS {
+        uuid id PK
+        varchar title
+        text description "nullable"
+        varchar status "todo, in_progress, review, done"
+        varchar priority "low, medium, high, urgent"
+        date due_date "nullable"
+        timestamp completed_at "nullable"
+        uuid project_id FK "NOT NULL, CASCADE"
+        timestamp created_at
+        timestamp updated_at
+    }
+    TASK_ASSIGNMENTS {
+        uuid id PK
+        uuid task_id FK "NOT NULL, CASCADE"
+        uuid member_id FK "NOT NULL, CASCADE"
+        varchar role "assignee, reviewer"
+        timestamp assigned_at
+        timestamp updated_at
+    }

@@ -1,0 +1,593 @@
+@baseUrl = http://localhost:3000
+@runId = 1
+@futureDate = 2026-12-31
+@teamId = ganti-dengan-id-dari-response
+@team2Id = ganti-dengan-id-dari-response
+@memberAId = ganti-dengan-id-dari-response
+@memberBId = ganti-dengan-id-dari-response
+@memberCId = ganti-dengan-id-dari-response
+@projectId = ganti-dengan-id-dari-response
+@taskId = ganti-dengan-id-dari-response
+@task2Id = ganti-dengan-id-dari-response
+@assignmentId = ganti-dengan-id-dari-response
+@assignment2Id = ganti-dengan-id-dari-response
+
+# Catatan: file ini hanya contoh request manual. Untuk skenario lengkap gunakan Postman Collection.
+# Ganti {{...}} dengan id asli dari response sebelumnya.
+
+### 00 - Health Check - GET / (aplikasi hidup)
+GET {{baseUrl}}/
+
+### 01 - Teams - Create team (sukses)
+POST {{baseUrl}}/teams
+Content-Type: application/json
+
+{
+  "name": "Tim Backend {{runId}}",
+  "description": "Tim pengembang API"
+}
+
+### 01 - Teams - Create team kedua (sukses)
+POST {{baseUrl}}/teams
+Content-Type: application/json
+
+{
+  "name": "Tim Frontend {{runId}}"
+}
+
+### 01 - Teams - Create team - nama duplikat (409)
+POST {{baseUrl}}/teams
+Content-Type: application/json
+
+{
+  "name": "Tim Backend {{runId}}"
+}
+
+### 01 - Teams - Create team - nama kosong (400)
+POST {{baseUrl}}/teams
+Content-Type: application/json
+
+{
+  "name": ""
+}
+
+### 01 - Teams - Create team - field tidak dikenal (400)
+POST {{baseUrl}}/teams
+Content-Type: application/json
+
+{
+  "name": "X",
+  "foo": "bar"
+}
+
+### 01 - Teams - Get all teams
+GET {{baseUrl}}/teams
+
+### 01 - Teams - Get team by id
+GET {{baseUrl}}/teams/{{teamId}}
+
+### 01 - Teams - Get team - id tidak ditemukan (404)
+GET {{baseUrl}}/teams/00000000-0000-4000-8000-000000000000
+
+### 01 - Teams - Get team - format id salah (400)
+GET {{baseUrl}}/teams/bukan-uuid
+
+### 01 - Teams - Update team (sukses)
+PATCH {{baseUrl}}/teams/{{teamId}}
+Content-Type: application/json
+
+{
+  "description": "Tim pengembang API (diperbarui)"
+}
+
+### 01 - Teams - Update team - nama bentrok (409)
+PATCH {{baseUrl}}/teams/{{teamId}}
+Content-Type: application/json
+
+{
+  "name": "Tim Frontend {{runId}}"
+}
+
+### 01 - Teams - Update team - id tidak ditemukan (404)
+PATCH {{baseUrl}}/teams/00000000-0000-4000-8000-000000000000
+Content-Type: application/json
+
+{
+  "name": "Apa saja"
+}
+
+### 02 - Members - Create member A (anggota Tim Backend)
+POST {{baseUrl}}/members
+Content-Type: application/json
+
+{
+  "name": "Andi Pratama",
+  "email": "andi.{{runId}}@example.com",
+  "phone": "081234567890",
+  "position": "Backend Developer",
+  "teamId": "{{teamId}}"
+}
+
+### 02 - Members - Create member B (anggota Tim Backend)
+POST {{baseUrl}}/members
+Content-Type: application/json
+
+{
+  "name": "Budi Santoso",
+  "email": "budi.{{runId}}@example.com",
+  "position": "QA Engineer",
+  "teamId": "{{teamId}}"
+}
+
+### 02 - Members - Create member C (anggota Tim Frontend)
+POST {{baseUrl}}/members
+Content-Type: application/json
+
+{
+  "name": "Citra Lestari",
+  "email": "citra.{{runId}}@example.com",
+  "teamId": "{{team2Id}}"
+}
+
+### 02 - Members - Create member - email duplikat (409)
+POST {{baseUrl}}/members
+Content-Type: application/json
+
+{
+  "name": "Andi Lagi",
+  "email": "andi.{{runId}}@example.com"
+}
+
+### 02 - Members - Create member - email tidak valid (400)
+POST {{baseUrl}}/members
+Content-Type: application/json
+
+{
+  "name": "Dodi",
+  "email": "bukan-email"
+}
+
+### 02 - Members - Create member - telepon tidak valid (400)
+POST {{baseUrl}}/members
+Content-Type: application/json
+
+{
+  "name": "Dodi",
+  "email": "dodi.{{runId}}@example.com",
+  "phone": "abc"
+}
+
+### 02 - Members - Create member - team tidak ditemukan (404)
+POST {{baseUrl}}/members
+Content-Type: application/json
+
+{
+  "name": "Dodi",
+  "email": "dodi.{{runId}}@example.com",
+  "teamId": "00000000-0000-4000-8000-000000000000"
+}
+
+### 02 - Members - Get all members
+GET {{baseUrl}}/members
+
+### 02 - Members - Get member by id
+GET {{baseUrl}}/members/{{memberAId}}
+
+### 02 - Members - Get member - id tidak ditemukan (404)
+GET {{baseUrl}}/members/00000000-0000-4000-8000-000000000000
+
+### 02 - Members - Update member (sukses)
+PATCH {{baseUrl}}/members/{{memberAId}}
+Content-Type: application/json
+
+{
+  "position": "Senior Backend Developer"
+}
+
+### 02 - Members - Update member - email bentrok (409)
+PATCH {{baseUrl}}/members/{{memberAId}}
+Content-Type: application/json
+
+{
+  "email": "budi.{{runId}}@example.com"
+}
+
+### 03 - Projects - Create project (sukses)
+POST {{baseUrl}}/projects
+Content-Type: application/json
+
+{
+  "name": "Aplikasi Kasir",
+  "description": "Pengembangan aplikasi kasir",
+  "status": "active",
+  "startDate": "2026-11-01",
+  "endDate": "2026-12-31",
+  "teamId": "{{teamId}}"
+}
+
+### 03 - Projects - Create project - tanggal selesai < tanggal mulai (400)
+POST {{baseUrl}}/projects
+Content-Type: application/json
+
+{
+  "name": "Salah Tanggal",
+  "startDate": "2026-12-31",
+  "endDate": "2026-11-01",
+  "teamId": "{{teamId}}"
+}
+
+### 03 - Projects - Create project - status tidak valid (400)
+POST {{baseUrl}}/projects
+Content-Type: application/json
+
+{
+  "name": "Salah Status",
+  "status": "ngawur",
+  "teamId": "{{teamId}}"
+}
+
+### 03 - Projects - Create project - team tidak ditemukan (404)
+POST {{baseUrl}}/projects
+Content-Type: application/json
+
+{
+  "name": "Tanpa Tim",
+  "teamId": "00000000-0000-4000-8000-000000000000"
+}
+
+### 03 - Projects - Create project - teamId wajib (400)
+POST {{baseUrl}}/projects
+Content-Type: application/json
+
+{
+  "name": "Tanpa teamId"
+}
+
+### 03 - Projects - Get all projects
+GET {{baseUrl}}/projects
+
+### 03 - Projects - Get project by id
+GET {{baseUrl}}/projects/{{projectId}}
+
+### 03 - Projects - Get project - id tidak ditemukan (404)
+GET {{baseUrl}}/projects/00000000-0000-4000-8000-000000000000
+
+### 03 - Projects - Update project (sukses)
+PATCH {{baseUrl}}/projects/{{projectId}}
+Content-Type: application/json
+
+{
+  "description": "Deskripsi diperbarui"
+}
+
+### 03 - Projects - Update project - id tidak ditemukan (404)
+PATCH {{baseUrl}}/projects/00000000-0000-4000-8000-000000000000
+Content-Type: application/json
+
+{
+  "name": "X"
+}
+
+### 04 - Tasks - Create task (sukses)
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Rancang skema database",
+  "description": "Buat ERD dan tabel",
+  "priority": "high",
+  "dueDate": "{{futureDate}}",
+  "projectId": "{{projectId}}"
+}
+
+### 04 - Tasks - Create task kedua (sukses)
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Buat endpoint login",
+  "projectId": "{{projectId}}"
+}
+
+### 04 - Tasks - Create task - tenggat sudah lewat (400)
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Telat",
+  "dueDate": "2020-01-01",
+  "projectId": "{{projectId}}"
+}
+
+### 04 - Tasks - Create task - prioritas tidak valid (400)
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Salah prioritas",
+  "priority": "ngawur",
+  "projectId": "{{projectId}}"
+}
+
+### 04 - Tasks - Create task - judul kosong (400)
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "",
+  "projectId": "{{projectId}}"
+}
+
+### 04 - Tasks - Create task - project tidak ditemukan (404)
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Tanpa proyek",
+  "projectId": "00000000-0000-4000-8000-000000000000"
+}
+
+### 04 - Tasks - Get all tasks
+GET {{baseUrl}}/tasks
+
+### 04 - Tasks - Get tasks - filter projectId & status
+GET {{baseUrl}}/tasks?projectId={{projectId}}&status=todo
+
+### 04 - Tasks - Get tasks - filter status tidak valid (400)
+GET {{baseUrl}}/tasks?status=ngawur
+
+### 04 - Tasks - Get task by id
+GET {{baseUrl}}/tasks/{{taskId}}
+
+### 04 - Tasks - Get task - id tidak ditemukan (404)
+GET {{baseUrl}}/tasks/00000000-0000-4000-8000-000000000000
+
+### 04 - Tasks - Update task (sukses)
+PATCH {{baseUrl}}/tasks/{{taskId}}
+Content-Type: application/json
+
+{
+  "title": "Rancang skema database (revisi)",
+  "priority": "urgent"
+}
+
+### 04 - Tasks - Update task - tenggat sudah lewat (400)
+PATCH {{baseUrl}}/tasks/{{taskId}}
+Content-Type: application/json
+
+{
+  "dueDate": "2020-01-01"
+}
+
+### 04 - Tasks - Update task - field status ditolak (400)
+PATCH {{baseUrl}}/tasks/{{taskId}}
+Content-Type: application/json
+
+{
+  "status": "done"
+}
+
+### 04 - Tasks - Update status - todo ke in_progress tanpa penugasan (400)
+PATCH {{baseUrl}}/tasks/{{taskId}}/status
+Content-Type: application/json
+
+{
+  "status": "in_progress"
+}
+
+### 05 - Task Assignments - Assign task ke 2 anggota sekaligus (sukses)
+POST {{baseUrl}}/task-assignments
+Content-Type: application/json
+
+{
+  "taskId": "{{taskId}}",
+  "memberIds": [
+    "{{memberAId}}",
+    "{{memberBId}}"
+  ]
+}
+
+### 05 - Task Assignments - Assign - anggota sudah ditugaskan (409)
+POST {{baseUrl}}/task-assignments
+Content-Type: application/json
+
+{
+  "taskId": "{{taskId}}",
+  "memberIds": [
+    "{{memberAId}}"
+  ]
+}
+
+### 05 - Task Assignments - Assign - anggota bukan dari tim proyek (400)
+POST {{baseUrl}}/task-assignments
+Content-Type: application/json
+
+{
+  "taskId": "{{task2Id}}",
+  "memberIds": [
+    "{{memberCId}}"
+  ]
+}
+
+### 05 - Task Assignments - Assign - task tidak ditemukan (404)
+POST {{baseUrl}}/task-assignments
+Content-Type: application/json
+
+{
+  "taskId": "00000000-0000-4000-8000-000000000000",
+  "memberIds": [
+    "{{memberAId}}"
+  ]
+}
+
+### 05 - Task Assignments - Assign - member tidak ditemukan (404)
+POST {{baseUrl}}/task-assignments
+Content-Type: application/json
+
+{
+  "taskId": "{{task2Id}}",
+  "memberIds": [
+    "00000000-0000-4000-8000-000000000000"
+  ]
+}
+
+### 05 - Task Assignments - Assign - memberIds kosong (400)
+POST {{baseUrl}}/task-assignments
+Content-Type: application/json
+
+{
+  "taskId": "{{taskId}}",
+  "memberIds": []
+}
+
+### 05 - Task Assignments - Assign - role tidak valid (400)
+POST {{baseUrl}}/task-assignments
+Content-Type: application/json
+
+{
+  "taskId": "{{task2Id}}",
+  "memberIds": [
+    "{{memberAId}}"
+  ],
+  "role": "bos"
+}
+
+### 05 - Task Assignments - Get all assignments
+GET {{baseUrl}}/task-assignments
+
+### 05 - Task Assignments - Get assignment by id
+GET {{baseUrl}}/task-assignments/{{assignmentId}}
+
+### 05 - Task Assignments - Get assignment - id tidak ditemukan (404)
+GET {{baseUrl}}/task-assignments/00000000-0000-4000-8000-000000000000
+
+### 05 - Task Assignments - Update assignment role (sukses)
+PATCH {{baseUrl}}/task-assignments/{{assignment2Id}}
+Content-Type: application/json
+
+{
+  "role": "reviewer"
+}
+
+### 05 - Task Assignments - Update assignment - role tidak valid (400)
+PATCH {{baseUrl}}/task-assignments/{{assignment2Id}}
+Content-Type: application/json
+
+{
+  "role": "bos"
+}
+
+### 05 - Task Assignments - Get task detail beserta anggota yang ditugaskan
+GET {{baseUrl}}/tasks/{{taskId}}
+
+### 06 - Alur Status Task - todo -> in_progress (sukses, sudah ada penugasan)
+PATCH {{baseUrl}}/tasks/{{taskId}}/status
+Content-Type: application/json
+
+{
+  "status": "in_progress"
+}
+
+### 06 - Alur Status Task - in_progress -> in_progress (400, status sama)
+PATCH {{baseUrl}}/tasks/{{taskId}}/status
+Content-Type: application/json
+
+{
+  "status": "in_progress"
+}
+
+### 06 - Alur Status Task - in_progress -> done (400, lompat status)
+PATCH {{baseUrl}}/tasks/{{taskId}}/status
+Content-Type: application/json
+
+{
+  "status": "done"
+}
+
+### 06 - Alur Status Task - Status tidak valid (400)
+PATCH {{baseUrl}}/tasks/{{taskId}}/status
+Content-Type: application/json
+
+{
+  "status": "ngawur"
+}
+
+### 06 - Alur Status Task - in_progress -> review (sukses)
+PATCH {{baseUrl}}/tasks/{{taskId}}/status
+Content-Type: application/json
+
+{
+  "status": "review"
+}
+
+### 06 - Alur Status Task - review -> done (sukses, completedAt terisi)
+PATCH {{baseUrl}}/tasks/{{taskId}}/status
+Content-Type: application/json
+
+{
+  "status": "done"
+}
+
+### 06 - Alur Status Task - Assign ke task yang sudah done (400)
+POST {{baseUrl}}/task-assignments
+Content-Type: application/json
+
+{
+  "taskId": "{{taskId}}",
+  "memberIds": [
+    "{{memberAId}}"
+  ]
+}
+
+### 06 - Alur Status Task - Update status - task tidak ditemukan (404)
+PATCH {{baseUrl}}/tasks/00000000-0000-4000-8000-000000000000/status
+Content-Type: application/json
+
+{
+  "status": "in_progress"
+}
+
+### 07 - Delete & Konflik Relasi - Delete assignment (204)
+DELETE {{baseUrl}}/task-assignments/{{assignmentId}}
+
+### 07 - Delete & Konflik Relasi - Delete assignment lagi (404)
+DELETE {{baseUrl}}/task-assignments/{{assignmentId}}
+
+### 07 - Delete & Konflik Relasi - Delete task (204)
+DELETE {{baseUrl}}/tasks/{{taskId}}
+
+### 07 - Delete & Konflik Relasi - Delete task lagi (404)
+DELETE {{baseUrl}}/tasks/{{taskId}}
+
+### 07 - Delete & Konflik Relasi - Delete team yang masih punya proyek (409)
+DELETE {{baseUrl}}/teams/{{teamId}}
+
+### 07 - Delete & Konflik Relasi - Delete project (204, task ikut terhapus)
+DELETE {{baseUrl}}/projects/{{projectId}}
+
+### 07 - Delete & Konflik Relasi - Delete project lagi (404)
+DELETE {{baseUrl}}/projects/{{projectId}}
+
+### 07 - Delete & Konflik Relasi - Cek task kedua ikut terhapus (404)
+GET {{baseUrl}}/tasks/{{task2Id}}
+
+### 07 - Delete & Konflik Relasi - Delete member A (204)
+DELETE {{baseUrl}}/members/{{memberAId}}
+
+### 07 - Delete & Konflik Relasi - Delete member B (204)
+DELETE {{baseUrl}}/members/{{memberBId}}
+
+### 07 - Delete & Konflik Relasi - Delete member C (204)
+DELETE {{baseUrl}}/members/{{memberCId}}
+
+### 07 - Delete & Konflik Relasi - Delete member lagi (404)
+DELETE {{baseUrl}}/members/{{memberAId}}
+
+### 07 - Delete & Konflik Relasi - Delete team Backend (204)
+DELETE {{baseUrl}}/teams/{{teamId}}
+
+### 07 - Delete & Konflik Relasi - Delete team Frontend (204)
+DELETE {{baseUrl}}/teams/{{team2Id}}
+
+### 07 - Delete & Konflik Relasi - Delete team lagi (404)
+DELETE {{baseUrl}}/teams/{{teamId}}

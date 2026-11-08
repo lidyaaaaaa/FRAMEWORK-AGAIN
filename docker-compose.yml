@@ -1,0 +1,18 @@
+services:
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: task_management_postgres_container
+    restart: always
+    environment:
+      POSTGRES_USER: taskadmin
+      POSTGRES_PASSWORD: taskadmin123
+      POSTGRES_DB: task_management
+    ports:
+      #format: "PortKomputerKalian:PortKomputerContainerDocker"
+      - "5434:5432"
+    volumes:
+      #menyimpan data database ke dalam volume disk laptop agar tidak hilang
+      - postgres_data_volume:/var/lib/postgresql/data
+
+volumes:
+  postgres_data_volume:
