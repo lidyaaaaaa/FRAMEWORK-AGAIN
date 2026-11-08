@@ -27,3 +27,5 @@ Gambar: [`erd.png`](./erd.png) (sumber diagram: [`erd.mmd`](./erd.mmd))
 8. `completed_at` terisi otomatis saat tugas menjadi `done` dan dikosongkan bila dibuka kembali.
 9. Penugasan hanya untuk anggota yang berasal dari tim pemilik proyek, tidak boleh ganda, dan tidak boleh pada tugas yang sudah `done`.
 10. Satu request penugasan dapat berisi beberapa anggota (`memberIds`) dan diproses dalam satu transaksi.
+11. Anggota yang masih memiliki penugasan pada tugas yang belum `done` tidak dapat dihapus, dipindah ke tim lain, atau dikeluarkan dari tim (409). Ini menjaga agar aturan nomor 9 tidak terlanggar oleh perubahan tim setelah penugasan dibuat.
+12. Penugasan terakhir pada tugas berstatus `in_progress` atau `review` tidak dapat dilepas (400), agar aturan nomor 7 tetap berlaku selama tugas dikerjakan.

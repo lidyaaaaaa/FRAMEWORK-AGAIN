@@ -63,8 +63,17 @@ export class MembersService {
     Object.assign(member, rest);
 
     if (teamId !== undefined) {
-      await this.ensureTeamExists(teamId);
-      member.team = { id: teamId } as Team;
+      const currentTeamId = member.team?.id ?? null;
+      if (teamId !== currentTeamId) {
+        // aturan bisnis: anggota yang masih punya tugas aktif tidak boleh pindah/keluar tim
+        this.ensureNoActiveAssignments(member, 'dipindahkan dari tim');
+        if (teamId === null) {
+          member.team = null;
+        } else {
+          await this.ensureTeamExists(teamId);
+          member.team = { id: teamId } as Team;
+        }
+      }
     }
 
     return this.membersRepository.save(member);
@@ -72,7 +81,19 @@ export class MembersService {
 
   async remove(id: string): Promise<boolean> {
     const member = await this.findById(id);
+    // aturan bisnis: anggota yang masih punya tugas aktif tidak boleh dihapus
+    this.ensureNoActiveAssignments(member, 'dihapus');
     await this.membersRepository.remove(member);
     return true;
+  }
+
+  // tugas aktif = penugasan pada tugas yang statusnya belum "done"
+  private ensureNoActiveAssignments(member: Member, action: string): void {
+    const active = (member.assignments ?? []).filter((a) => a.task.status !== 'done');
+    if (active.length > 0) {
+      throw new ConflictException(
+        `Member "${member.name}" masih memiliki ${active.length} tugas aktif dan tidak dapat ${action}. Lepas penugasannya terlebih dahulu`,
+      );
+    }
   }
 }

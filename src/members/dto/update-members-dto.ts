@@ -21,7 +21,8 @@ export class UpdateMemberDto {
   @MaxLength(100, { message: 'Posisi maksimal 100 karakter' })
   readonly position?: string;
 
+  // null = keluarkan anggota dari tim, UUID = pindah tim, tidak diisi = tidak diubah
   @IsOptional()
   @IsUUID('all', { message: 'teamId harus berupa UUID yang valid' })
-  readonly teamId?: string;
+  readonly teamId?: string | null;
 }

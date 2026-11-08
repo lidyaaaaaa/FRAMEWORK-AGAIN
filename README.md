@@ -11,6 +11,7 @@ Teknologi: NestJS 12, TypeScript, TypeORM, PostgreSQL, class-validator / class-t
 | Dokumen | Lokasi |
 |---|---|
 | ERD | [`docs/ERD.md`](docs/ERD.md), gambar `docs/erd.png` |
+| Alur request (middleware → pipe → controller → service → DB) | [`docs/REQUEST-FLOW.md`](docs/REQUEST-FLOW.md) |
 | API Specification | [`docs/API-SPECIFICATION.md`](docs/API-SPECIFICATION.md) |
 | Postman Collection | [`postman/task-management.postman_collection.json`](postman/task-management.postman_collection.json) |
 | Request manual (.http) | [`task-management.http`](task-management.http) |
@@ -43,7 +44,7 @@ npm run migration:run
 | PORT | 3000 | Port aplikasi |
 | NODE_ENV | development | `development` mengaktifkan log query TypeORM |
 | DB_HOST | localhost | Host database |
-| DB_PORT | 5432 | Port database |
+| DB_PORT | 5434 | Port database; harus sama dengan port sisi kiri di `docker-compose.yml` (`5434:5432`) |
 | DB_USERNAME | taskadmin | Harus sama dengan `POSTGRES_USER` di `docker-compose.yml` |
 | DB_PASSWORD | taskadmin123 | Harus sama dengan `POSTGRES_PASSWORD` |
 | DB_DATABASE | task_management | Harus sama dengan `POSTGRES_DB` |
@@ -84,7 +85,7 @@ Aplikasi berjalan di `http://localhost:3000`.
 ## Menjalankan pengujian
 
 ```bash
-# unit test
+# unit test (33 test: service Tasks, TaskAssignments, Members + komponen common)
 npm run test
 ```
 
@@ -92,7 +93,7 @@ npm run test
 
 1. Pastikan aplikasi dan database berjalan.
 2. Import `postman/task-management.postman_collection.json` ke Postman.
-3. Buka **Collection Runner**, pilih collection, lalu **Run** secara berurutan (folder 00 sampai 07).
+3. Buka **Collection Runner**, pilih collection, lalu **Run** secara berurutan (folder 00 sampai 08; folder 08 menguji aturan bisnis hasil revisi).
 4. Variabel id (`teamId`, `taskId`, dll.) tersimpan otomatis. Data uji dibersihkan oleh folder 07.
 5. Ubah variabel `baseUrl` bila aplikasi tidak berjalan di `http://localhost:3000`.
 
@@ -125,3 +126,5 @@ Lengkapnya ada di [`docs/ERD.md`](docs/ERD.md). Ringkasnya:
 - Tugas hanya dapat dikerjakan bila sudah ditugaskan ke minimal satu anggota.
 - Penugasan hanya untuk anggota dari tim pemilik proyek, tidak boleh ganda.
 - Tim yang masih memiliki proyek tidak dapat dihapus; menghapus proyek ikut menghapus tugasnya.
+- Anggota yang masih punya tugas aktif (belum `done`) tidak dapat dihapus, dipindah, atau dikeluarkan dari tim.
+- Penugasan terakhir pada tugas `in_progress` / `review` tidak dapat dilepas.

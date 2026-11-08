@@ -150,10 +150,11 @@ Response `201`: objek member (`id`, `name`, `email`, `phone`, `position`, `team`
 Error: `400` validasi, `404` tim tidak ditemukan, `409` email sudah terdaftar.
 
 ### PATCH `/members/:id`
-Semua field opsional. Error: `400`, `404` (member/tim), `409` (email bentrok).
+Semua field opsional. `teamId` berisi UUID untuk pindah tim, `null` untuk mengeluarkan anggota dari tim, atau tidak diisi bila tidak berubah.
+Error: `400`, `404` (member/tim), `409` (email bentrok, atau anggota masih punya tugas aktif saat pindah/keluar tim).
 
 ### DELETE `/members/:id`
-Penugasan milik anggota ikut terhapus. Error: `404`.
+Ditolak (`409`) bila anggota masih punya penugasan pada tugas yang belum `done`. Penugasan pada tugas `done` ikut terhapus. Error: `404`, `409`.
 
 ## 5. Projects
 
@@ -318,4 +319,4 @@ Error: `400` (role tidak valid), `404`.
 Response berisi `task` dan `member`.
 
 ### DELETE `/task-assignments/:id`
-Error: `404`.
+Penugasan terakhir pada tugas berstatus `in_progress` atau `review` tidak dapat dilepas (`400`); ubah status tugas ke `todo` dulu. Error: `400`, `404`.

@@ -101,6 +101,19 @@ export class TaskAssignmentsService {
 
   async remove(id: string): Promise<boolean> {
     const assignment = await this.findById(id);
+
+    // aturan bisnis: tugas yang sedang dikerjakan harus tetap punya minimal satu penugasan
+    if (assignment.task.status === 'in_progress' || assignment.task.status === 'review') {
+      const total = await this.assignmentsRepository.count({
+        where: { task: { id: assignment.task.id } },
+      });
+      if (total <= 1) {
+        throw new BadRequestException(
+          `Penugasan terakhir pada tugas berstatus "${assignment.task.status}" tidak dapat dilepas. Kembalikan status ke "todo" terlebih dahulu`,
+        );
+      }
+    }
+
     await this.assignmentsRepository.remove(assignment);
     return true;
   }
